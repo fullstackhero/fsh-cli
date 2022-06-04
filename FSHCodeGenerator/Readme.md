@@ -5,14 +5,17 @@ Run Migration if needed.
 
 IMPORTANT : Before we can start using this tool we need to scaffold the entities and context files.
 			This is done by Powershell or in the package manager console.
+			
 			=>  command based on fullstackhero !!
 			command =  Scaffold-DbContext "Data Source=(localdb)\mssqllocaldb;Initial Catalog=fullStackHeroDb;Integrated Security=True;MultipleActiveResultSets=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir Context -Context SourceGenContext -ContextNamespace FSHCodeGenerator -Force
+			
 			!! there is a fake applicationdbcontext in the project this is needed because otherwise build fails.
 			 the scaffold command has the -Force flag so the fake context is overwritten.	
 			!! single backslash (double backslash = error)
 
 Change appsettings with the appropriate settings
-set the path to the dbcontext of your solution not the local fake one. 
+!! set the path to the dbcontext of your solution not the local fake one. 
+
 
 The generated files are 'basic'
 The Dto of the child entity takes only the first property of the parent entity 
