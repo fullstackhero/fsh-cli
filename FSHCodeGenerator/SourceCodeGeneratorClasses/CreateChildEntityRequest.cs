@@ -1,7 +1,7 @@
 ﻿namespace FSHCodeGenerator.SourceCodeGeneratorClasses;
 internal class CreateChildEntityRequest
 {
-    public CreateChildEntityRequest(string filesavelocation, string _request, string _propertylines, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventpath)
+    public CreateChildEntityRequest(string filesavelocation, string _request, string _propertylines, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventpath,string _guidLines)
     {
         string basicsources = pathtobasicsources + "CreateChildEntityRequest.txt";
         string thenamespace = stringnamespace + entitynameplural;
@@ -12,11 +12,12 @@ internal class CreateChildEntityRequest
             .Replace("<&EntityPlural&>", entitynameplural)
             .Replace("<&EventsPath&>", eventpath)
             .Replace("<&PropertyLines&>", _propertylines)
+            .Replace("<&GuidLines&>", _guidLines)
             .Replace("<&StringNameSpace&>", thenamespace)
             .Replace("<&Entity&>", entity)
             .Replace("<&EntityToLower&>", entitytolower)
             .Replace("<&Request&>", _request);
 
-        File.WriteAllText(filesavelocation + "/" + "Create" + entity + "Request.cs", createentityrequest);
+        File.WriteAllText(filesavelocation + "/" + "Create" + entity.Trim() + "Request.cs", createentityrequest);
     }
 }

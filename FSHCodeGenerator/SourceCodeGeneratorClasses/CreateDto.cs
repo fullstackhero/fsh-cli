@@ -18,7 +18,7 @@ internal class CreateDto
        
         //dtoText = dtoText.Replace("^(?:[\t ]*(?:\r?\n|\r))+", string.Empty);
         //dtoText = Regex.Replace(dtoText, @"(^\p{Zs}*\r\n){2,}", "\r\n", RegexOptions.Multiline);
-        File.WriteAllText(filesavelocation+"/"+ entitynameplural.Trim() + "/" + entity.Trim() + "Dto.cs", dtoText);
+        File.WriteAllText(filesavelocation + "/" + entity.Trim() + "Dto.cs", dtoText);
 
         if (hasnavigations)
         {
@@ -29,12 +29,10 @@ internal class CreateDto
             dtoDetailsText = dtoDetailsText.Replace("<&theusings&>", theusings);
             dtoDetailsText = dtoDetailsText.Replace("<&StringNameSpace&>", thenamespace);
             dtoDetailsText = dtoDetailsText.Replace("<&Entity&>", className);
-            dtoDetailsText = dtoDetailsText.Replace("<&PropertyLines&>", propertylines);
-           // dtoDetailsText = dtoDetailsText.Replace("<&virtualLines&>", string.Empty);
-            dtoDetailsText = dtoText.Replace("<&DtoLines&>", dtoLines);
-        //    dtoDetailsText = dtoDetailsText.Replace("<&DetailLines&>", detaillines);
-          //  dtoDetailsText = Regex.Replace(dtoDetailsText, @"(^\p{Zs}*\r\n){2,}", "\r\n", RegexOptions.Multiline);
-            File.WriteAllText(filesavelocation + "/" + entitynameplural.Trim() + "/" + entity.Trim() + "DetailsDto.cs", dtoDetailsText);
+            dtoDetailsText = dtoDetailsText.Replace("<&PropertyLines&>", propertylines);           
+            dtoDetailsText = dtoDetailsText.Replace("<&DtoLines&>", dtoLines);
+       
+            File.WriteAllText(filesavelocation + "/" + entity.Trim() + "DetailsDto.cs", dtoDetailsText);
         }
     }
 }

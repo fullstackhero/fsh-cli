@@ -1,27 +1,29 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace FSHCodeGenerator.SourceCodeGeneratorClasses;
-internal class CreateEntityRequestValidator
+internal class UpdateEntityRequestValidator
 {
-    public CreateEntityRequestValidator(string filesavelocation, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventpath, string validatortype, string validatorname, Dictionary<string, string> pks, string theusings)
+    public UpdateEntityRequestValidator(string filesavelocation, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventpath, string validatortype, string validatorname, Dictionary<string, string> pks, string theusings)
     {
-        string basicsources = pathtobasicsources + "CreateEntityRequestValidator.txt";
+        string basicsources = pathtobasicsources + "UpdateEntityRequestValidator.txt";
         string navrules = pathtobasicsources + "RuleForNavigation.txt";
         string thenamespace = stringnamespace + entitynameplural;
         string entitytolower = entity.ToLower();
-        string createentityrequestvalidator = string.Empty;
+        string updateentityrequestvalidator = string.Empty;
         string readrepository = string.Empty;
         string rulefornavigation = string.Empty;
         string rulesfornavigations = string.Empty;
         string request = string.Empty;
         string relationalLines = string.Empty;
+        string propertyLines = string.Empty;
         string inputLine = string.Empty;
         string getSet = string.Empty;
-        string validatorType = string.Empty;
-        string validatorName = string.Empty;
         string asyncsources = pathtobasicsources + "ValidatorRuleForParent.txt";
         string parentrule = string.Empty;
-
         foreach (var key in pks)
         {
             string parentEntity = key.Key;
@@ -30,12 +32,12 @@ internal class CreateEntityRequestValidator
             string parent = File.ReadAllText(asyncsources)
             .Replace("<&Parent&>", parentEntity)
             .Replace("<&ParentToLower&>", parentEntity.ToLower());
-            parentrule = parentrule + parent + Environment.NewLine + "\t";
+            parentrule = parentrule + parent + Environment.NewLine;
         }
-        createentityrequestvalidator = File.ReadAllText(basicsources)
-        .Replace("<&Usings&>", theusings)
-        .Replace("<&EventsPath&>", eventpath)
 
+        updateentityrequestvalidator = File.ReadAllText(basicsources)
+        .Replace("<&Usings&>", theusings)
+        .Replace("<&EventsPath&>", eventpath)        
         .Replace("<&StringNameSpace&>", thenamespace)
         .Replace("<&Entity&>", entity)
         .Replace("<&EntityToLower&>", entitytolower)
@@ -44,6 +46,14 @@ internal class CreateEntityRequestValidator
         .Replace("<&ValidatorName&>", validatorname)
         .Replace("<&ValidatorNameToLower&>", validatorname.ToLower())
         .Replace("<&ParentRule&>", parentrule);
-        File.WriteAllText(filesavelocation + "/" + "Create" + entity + "RequestValidator.cs", createentityrequestvalidator);
+        File.WriteAllText(filesavelocation+ "/" + "Update" + entity + "RequestValidator.cs", updateentityrequestvalidator);
+
+        //createentityrequestvalidator = File.ReadAllText(basicsources)
+        //.Replace("<&StringNameSpace&>", thenamespace)
+        //.Replace("<&Entity&>", entity)
+        //.Replace("<&EntityToLower&>", entitytolower)
+        //.Replace("<&ReadRepository&>", readrepository)
+        //.Replace("<&RulesForRelations&>", rulesfornavigations);
+        //File.WriteAllText(filesavelocation + "/" + "Update" + entity + "RequestValidator.cs", createentityrequestvalidator);
     }
 }

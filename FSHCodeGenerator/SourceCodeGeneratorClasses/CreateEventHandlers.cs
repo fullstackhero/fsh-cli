@@ -12,12 +12,12 @@ internal class CreateEventHandlers
             .Replace("<&Entity&>", entity)
             .Replace("<&Action&>", "Created");
             File.WriteAllText(filesavelocation + "/" + entity.Trim() + "CreatedEventHandler.cs", eventHandlerCreate);
-
+          
             string eventHandlerDelete = File.ReadAllText(basicsources)
             .Replace("<&StringNameSpace&>", thenamespace)
             .Replace("<&Entity&>", entity)
             .Replace("<&Action&>", "Deleted");
-            File.WriteAllText(filesavelocation + "/" + entity.Trim() + "DeletedEventHandler.cs", eventHandlerDelete);
+            File.WriteAllText(filesavelocation  + "/" + entity.Trim() + "DeletedEventHandler.cs", eventHandlerDelete);
 
             string eventHandlerUpdate = File.ReadAllText(basicsources)
           .Replace("<&StringNameSpace&>", thenamespace)

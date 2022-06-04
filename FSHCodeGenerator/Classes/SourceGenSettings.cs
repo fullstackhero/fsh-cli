@@ -8,6 +8,7 @@
         public string DbContext { get; set; } = String.Empty;
         public string PathToData { get; set; } = String.Empty;
         public string StringNameSpace { get; set; } = String.Empty;
+        public string PermissionsNameSpace { get; set; } = String.Empty;
         public string PathToControllers { get; set; } = String.Empty;
         public string ControllersNamespace { get; set; } = String.Empty;
         public string PathToApplicationCatalog { get; set; } = String.Empty;
