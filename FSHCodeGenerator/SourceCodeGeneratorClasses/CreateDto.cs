@@ -1,4 +1,8 @@
-﻿using System.Text.RegularExpressions;
+﻿using Microsoft.CSharp;
+using System.CodeDom.Compiler;
+using Microsoft.CodeAnalysis.CSharp;
+using System.Text.RegularExpressions;
+
 
 namespace FSHCodeGenerator.SourceCodeGeneratorClasses;
 internal class CreateDto
@@ -7,18 +11,21 @@ internal class CreateDto
     {
         string basicsources = pathtobasicsources + "BasicDto.txt";
         string thenamespace = stringnamespace + entitynameplural;
-        string dtoText = File.ReadAllText(basicsources);        
-        
+        string dtoText = File.ReadAllText(basicsources);
+        bool lsuccess = false;
+
         dtoText = dtoText.Replace("<&theusings&>", string.Empty);
         dtoText = dtoText.Replace("<&StringNameSpace&>", thenamespace);
         dtoText = dtoText.Replace("<&Entity&>", entity + "Dto");
         dtoText = dtoText.Replace("<&PropertyLines&>", propertylines);
-        dtoText = dtoText.Replace("<&GuidLines&>", guidLines);        
+        dtoText = dtoText.Replace("<&GuidLines&>", guidLines);
         dtoText = dtoText.Replace("<&ParentLines&>", parentLines);
-       
+
         //dtoText = dtoText.Replace("^(?:[\t ]*(?:\r?\n|\r))+", string.Empty);
         //dtoText = Regex.Replace(dtoText, @"(^\p{Zs}*\r\n){2,}", "\r\n", RegexOptions.Multiline);
-        File.WriteAllText(filesavelocation + "/" + entity.Trim() + "Dto.cs", dtoText);
+
+        File.WriteAllText(filesavelocation + "/" + entity.Trim() + "Dto.cs", dtoText);      
+
 
         if (hasnavigations)
         {
@@ -29,11 +36,12 @@ internal class CreateDto
             dtoDetailsText = dtoDetailsText.Replace("<&theusings&>", theusings);
             dtoDetailsText = dtoDetailsText.Replace("<&StringNameSpace&>", thenamespace);
             dtoDetailsText = dtoDetailsText.Replace("<&Entity&>", className);
-            dtoDetailsText = dtoDetailsText.Replace("<&PropertyLines&>", propertylines);           
+            dtoDetailsText = dtoDetailsText.Replace("<&PropertyLines&>", propertylines);
             dtoDetailsText = dtoDetailsText.Replace("<&DtoLines&>", dtoLines);
-       
+
             File.WriteAllText(filesavelocation + "/" + entity.Trim() + "DetailsDto.cs", dtoDetailsText);
         }
     }
-}
 
+   
+}

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FSHCodeGenerator.SourceCodeGeneratorClasses;
 internal class UpdateEntityWithNavRequest
 {
-    public UpdateEntityWithNavRequest(string filesavelocation, string _request, string _propertylines, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventsusing, string validatortype, string validatorname)
+    public UpdateEntityWithNavRequest(string filesavelocation, string _request, string _propertylines, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventsusing, string validatortype, string validatorname, string guidlines)
     {
         string basicsources = pathtobasicsources + "UpdateEntityWithNavRequest.txt";
         string thenamespace = stringnamespace + entitynameplural;
@@ -17,6 +17,7 @@ internal class UpdateEntityWithNavRequest
         createentityrequest = File.ReadAllText(basicsources)
         .Replace("<&EventsPath&>", eventsusing)
         .Replace("<&PropertyLines&>", _propertylines)
+        .Replace("<&GuidLines&>",guidlines)
         .Replace("<&StringNameSpace&>", thenamespace)
         .Replace("<&Entity&>", entity)
         .Replace("<&EntityToLower&>", entitytolower)

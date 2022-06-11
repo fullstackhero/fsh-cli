@@ -1,7 +1,7 @@
 ﻿namespace FSHCodeGenerator.SourceCodeGeneratorClasses;
 internal class UpdateEntityRequest
 {
-    public UpdateEntityRequest(string pathtodata, string filesavelocation, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventpath, string validatortype, string validatorname, string propertyLines, string request)
+    public UpdateEntityRequest(string pathtodata, string filesavelocation, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural, string eventpath, string validatortype, string validatorname, string propertyLines, string request, string guidlines)
     {
         string basicsources = pathtobasicsources + "UpDateEntityRequest.txt";
         string thenamespace = stringnamespace + entitynameplural;
@@ -15,6 +15,7 @@ internal class UpdateEntityRequest
             .Replace("<&EntityPlural&>", entitynameplural)
             .Replace("<&EventsPath&>", eventpath)
             .Replace("<&PropertyLines&>", propertyLines)
+            .Replace("<&GuidLines&>", guidlines)
             .Replace("<&StringNameSpace&>", thenamespace)
             .Replace("<&Entity&>", entity)
             .Replace("<&EntityToLower&>", entitytolower)

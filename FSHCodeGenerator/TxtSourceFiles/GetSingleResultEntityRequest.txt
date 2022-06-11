@@ -22,6 +22,6 @@ public class Get<&Entity&>RequestHandler : IRequestHandler<Get<&Entity&>Request,
 
     public async Task<<&Entity&>Dto> Handle(Get<&Entity&>Request request, CancellationToken cancellationToken) =>
         await _repository.GetBySpecAsync(
-            (ISpecification<<&Entity&>, <&Entity&>Dto>)new <&Entity&>ByIdSpec(request.Id), cancellationToken)
+        (ISpecification<<&Entity&>, <&Entity&>Dto>)new <&Entity&>ByIdSpec(request.Id), cancellationToken)
         ?? throw new NotFoundException(_t["<&EntityToLower&> {0} Not Found", request.Id]);
 }

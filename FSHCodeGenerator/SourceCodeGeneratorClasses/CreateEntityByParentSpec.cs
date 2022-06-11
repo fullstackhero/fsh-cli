@@ -6,11 +6,12 @@ internal class CreateEntityByParentSpec
         string basicsources = pathtobasicsources + "EntityByParentSpec.txt";
         string thenamespace = stringnamespace + entitynameplural;
         string entitytolower = entity.ToLower();
+        string tempsource = basicsources;
         foreach (var key in pks)
         {
             string parentEntity = key.Key;
             string parentEntityPlural = key.Value;
-            string parent = File.ReadAllText(basicsources)
+            string parent = File.ReadAllText(tempsource)
                 .Replace("<&StringNameSpace&>", thenamespace)
                 .Replace("<&Entity&>", entity)
                 .Replace("<&EntityPlural&>", entitynameplural)
@@ -18,7 +19,8 @@ internal class CreateEntityByParentSpec
                 .Replace("<&ParentToLower&>", parentEntity.ToLower());
 
             File.WriteAllText(filesavelocation + "/" + entitynameplural + "By" + parentEntity + "Spec.cs", parent);
-        }
+            basicsources = basicsources + parent + Environment.NewLine;       }
+   
 
     }
 }

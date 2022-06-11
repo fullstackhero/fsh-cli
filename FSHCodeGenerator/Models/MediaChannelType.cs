@@ -3,18 +3,16 @@ using System.Collections.Generic;
 
 namespace FSHCodeGenerator.Models
 {
-    public partial class TheParent
+    public partial class MediaChannelType
     {
-        public TheParent()
+        public MediaChannelType()
         {
-            TheChildren = new HashSet<TheChild>();
+            Channels = new HashSet<Channel>();
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public int MyIntValue { get; set; }
-        public Guid MyGuidValue { get; set; }
         public Guid CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public Guid LastModifiedBy { get; set; }
@@ -22,6 +20,6 @@ namespace FSHCodeGenerator.Models
         public DateTime? DeletedOn { get; set; }
         public Guid? DeletedBy { get; set; }
 
-        public virtual ICollection<TheChild> TheChildren { get; set; }
+        public virtual ICollection<Channel> Channels { get; set; }
     }
 }

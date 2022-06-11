@@ -22,4 +22,5 @@ public class Search<&EntityPlural&>RequestHandler : IRequestHandler<Search<&Enti
         var spec = new <&EntityPlural&>BySearchRequestSpec(request);
         return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
     }
+
 }

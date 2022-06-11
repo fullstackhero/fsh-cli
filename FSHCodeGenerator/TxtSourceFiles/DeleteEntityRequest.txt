@@ -1,5 +1,7 @@
 ﻿<&usingpathtochildren&>
+
 namespace <&StringNameSpace&>;
+
 public class Delete<&Entity&>Request : IRequest<Guid>
 {
     public Guid Id { get; set; }
@@ -15,7 +17,7 @@ public class Delete<&Entity&>RequestHandler : IRequestHandler<Delete<&Entity&>Re
    private readonly IStringLocalizer _t;
 
 
-     public Delete<&Entity&>RequestHandler(IRepositoryWithEvents<<&Entity&>> <&EntityToLower&>Repo,<&PublicRepositoryLine&> IStringLocalizer<Delete<&Entity&>RequestHandler> localizer) =>
+    public Delete<&Entity&>RequestHandler(IRepositoryWithEvents<<&Entity&>> <&EntityToLower&>Repo,<&PublicRepositoryLine&> IStringLocalizer<Delete<&Entity&>RequestHandler> localizer) =>
         (<&repo_Repo&> _t) = (<&repoRepo&> localizer);
 
     

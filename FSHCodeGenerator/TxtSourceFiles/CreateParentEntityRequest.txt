@@ -4,6 +4,7 @@ namespace <&StringNameSpace&>;
 public class Create<&Entity&>Request : IRequest<Guid>
 {
     <&PropertyLines&>
+    <&GuidLines&>
 }
 
 

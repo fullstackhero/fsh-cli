@@ -12,6 +12,7 @@ using ILogger = Serilog.ILogger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using FSHCodeGenerator.SourceCodeGeneratorClasses;
+using System.Linq.Expressions;
 
 namespace FSHCodeGenerator.Classes
 {
@@ -40,10 +41,7 @@ namespace FSHCodeGenerator.Classes
         private string _validatorType = string.Empty;
         private string _validatorName = string.Empty;
         private bool _hasNavigations = false;
-        private bool fakeref = true;
-
-
-        private IDictionary _foreignKeyEntities = new Dictionary<string, string>();
+             
 
 
 
@@ -61,11 +59,18 @@ namespace FSHCodeGenerator.Classes
             var myDatabaseSettings = _config.GetSection("DataBaseSettings").Get<DataBaseSettings>();
             var theEntities = GetEntities.entities;
             var entityTypes = _genContext.Model.GetEntityTypes();
+            var properties = _genContext.GetType().GetProperties();
+
             var _parentKeys = new Dictionary<string, string>();
             var _foreignKeys = new Dictionary<string, string>();
-            var _newEntities = new Dictionary<string, string>();
+            var _allEntities = new Dictionary<string, string>();
             var _applicationCatalog = string.Empty;
-
+            
+            // create dictionary with all the entity and dbset names of our SourceGenContext to be used for navigationproperties
+            foreach (var entityType in _genContext.Model.GetEntityTypes())
+            {
+               _allEntities.Add(entityType.DisplayName(), entityType.GetTableName());               
+            }
             entityTypes?.ToList().ForEach(t =>
                     {
                         // clear entity related properties
@@ -86,16 +91,14 @@ namespace FSHCodeGenerator.Classes
                         _repo_Repo = "_" + _entityName.ToLower() + "Repo,";
                         _repoRepo = _entityName.ToLower() + "Repo,";
                         _parentKeys.Clear();
-                        _foreignKeys.Clear();
+                      
 
                         string applicationCatalog = Path.Combine(sourceSettings.PathToFSHBoilerPlate, sourceSettings.PathToApplicationCatalog);
 
                         bool entityFound = theEntities.TryGetValue(t.DisplayName(), out _entityPlural);
 
                         if (entityFound) // the Ef core entity is found in the Dictionary of our context entities
-                        {
-                            // feed to Dictionary to holds only our new entities to be used outside foreach loop
-                            _newEntities.Add(_entityName, _entityPlural);
+                        {                            
                             string pathToCatalog = Path.Combine(applicationCatalog, _entityPlural.Trim());
 
 
@@ -119,14 +122,20 @@ namespace FSHCodeGenerator.Classes
 
                                         // string ent = t.DisplayName();
                                         foreach (var fKey in fKeys)
+                                        
                                         {
                                             string fk = fKey.PrincipalEntityType.DisplayName();
+                                            string fkplural = string.Empty;
                                             bool addnewline = _readrepositoryLines == string.Empty ? true : false;
                                             _usingpathtochildren = _usingpathtochildren + "using " + sourceSettings.StringNameSpace + _declaringEntity + ";" + Environment.NewLine;
                                             _readrepositoryLines = _readrepositoryLines + (addnewline ? " " : Environment.NewLine) + "private readonly IReadRepository<" + _valuesingle + "> _" + _valuesingle.ToLower() + "Repo;";
                                             _publicrepositoryLine = _publicrepositoryLine + " IReadRepository<" + _valuesingle + "> " + _valuesingle.ToLower() + "Repo" + ",";
                                             _repo_Repo = _repo_Repo + " _" + fk + "Repo,";
                                             _repoRepo = _repoRepo + " " + fk + "Repo,";
+                                            if (theEntities.TryGetValue(fk, out fkplural))
+                                            {
+                                                _foreignKeys.Add(fk, fkplural);
+                                            }
                                         }
                                     }
                                     else
@@ -141,82 +150,92 @@ namespace FSHCodeGenerator.Classes
                                     {
                                         foreach (var key in parentkeys)
                                         {
-                                            _principalEntity = key.PrincipalEntityType.DisplayName();
-                                            //   _principalEntity = key.PrincipalEntityType.GetTableName();
-                                            // string value = theEntities[_principalEntity];
+                                            _principalEntity = key.PrincipalEntityType.DisplayName();                                         
                                             if (_principalEntity != _entityName)
                                             {
                                                 _parentKeys.Add(_principalEntity, _entityPlural);
                                             }
                                         }
                                     }
-
-
                                     var stringNamespace = sourceSettings.StringNameSpace;
                                     this.EntityProperties(_entityName, _entityPlural, pathToEntity, stringNamespace, theEntities);
 
                                     applicationCatalog = applicationCatalog + "/" + _entityPlural.Trim();
                                     // create the source files 
 
+                                    if (!String.IsNullOrEmpty(_request) && _request.Trim().EndsWith(","))
+                                    {
+                                        _request = _request.Remove(_request.Trim().Length - 1);
+                                    }
+
+
                                     if (_hasNavigations)
                                     {
-                                        Log.Information("Create EventHandlers");
+                                        _log.LogInformation("Create EventHandlers");
                                         string pathToEventHandlers = applicationCatalog + "\\EventHandlers";
                                         CreateEventHandlers newEventHandlers = new CreateEventHandlers(pathToEventHandlers, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural);
 
-                                        Log.Information("Create DTO");
+                                        _log.LogInformation("Create DTO");
                                         CreateDto newNavCreateDto = new CreateDto(applicationCatalog, _propertyLines.Trim() , _detailLines.Trim(), _parentLines.Trim(), _guidLines.Trim(), _dtoLines.Trim(), _theusings, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural.Trim(), _hasNavigations); ;
 
-                                        Log.Information("Create " + _entityName + " Request");
+                                        _log.LogInformation("Create " + _entityName + " Request");
                                         CreateChildEntityRequest newChildEntityRequest = new CreateChildEntityRequest(applicationCatalog, _request, _propertyLines.Trim(), sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _guidLines.Trim());
 
-                                        Log.Information("Create " + _entityName + " Request Validator");
+                                        _log.LogInformation("Create " + _entityName + " Request Validator");
                                         CreateEntityRequestValidator newCreateEntityRequestValidator = new CreateEntityRequestValidator(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName, _parentKeys, _theusings);
 
-                                        Log.Information("Create Delete " + _entityName + " Request");
+                                        _log.LogInformation("Create Delete " + _entityName + " Request");
                                         DeleteEntityWithNavRequest newDeleteEntityWithNavRequest = new DeleteEntityWithNavRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural.Trim(), sourceSettings.EventsUsing);
 
-                                        Log.Information("Create" + _entityName + " By Parent Spec");
+                                        _log.LogInformation("Create" + _entityName + " By Parent Spec");
                                         CreateEntityByParentSpec newEntityByParentSpec = new CreateEntityByParentSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys);
 
-                                        Log.Information("Create" + _entityName + " By Name spec");
+                                        _log.LogInformation("Create" + _entityName + " By Name spec");
                                         CreateEntityByTypeSpec newEntityByNameSpec = new CreateEntityByTypeSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _validatorType, _validatorName);
 
-                                        Log.Information("Create Get" + _entityName + " via Dapper request");
+                                        _log.LogInformation("Create Get" + _entityName + " via Dapper request");
                                         GetEntityViaDapperRequest newGetEntityViaDapperRequest = new GetEntityViaDapperRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural);
+                                        
+                                        _log.LogInformation("Create Get" + _entityName + " Request");
+                                        GetEntityWithNavRequest newGetEntityWithNavRequest = new GetEntityWithNavRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _foreignKeys);
 
-                                        Log.Information("Create Get" + _entityName + " Request");
-                                        GetEntityWithNavRequest newGetEntityWithNavRequest = new GetEntityWithNavRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys);
+                                        _log.LogInformation("Create Search" + _entityName + " Request");
+                                        SearchEntityWithNavRequest newSearchParentEntityRequest = new SearchEntityWithNavRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys,_allEntities);
+                                        EntitiesBySearchRequestWithParentSpec newEntitiesBySearchRequestWithParentSpec = new EntitiesBySearchRequestWithParentSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _foreignKeys);
 
-                                        Log.Information("Create Search" + _entityName + " Request");
-                                        SearchParentEntityRequest newSearchParentEntityRequest = new SearchParentEntityRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys);
-                                        EntitiesBySearchRequestWithParentSpec newEntitiesBySearchRequestWithParentSpec = new EntitiesBySearchRequestWithParentSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys);
-
-                                        Log.Information("Create Update" + _entityName + " Request");
-                                        UpdateEntityWithNavRequest newUpdateEntityWithNavRequest = new UpdateEntityWithNavRequest(applicationCatalog, _request, _propertyLines.Trim(), sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName);
+                                        _log.LogInformation("Create Update" + _entityName + " Request");
+                                        UpdateEntityWithNavRequest newUpdateEntityWithNavRequest = new UpdateEntityWithNavRequest(applicationCatalog, _request, _propertyLines.Trim(), sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName,_guidLines);
                                         UpdateEntityRequestValidator newUpdateEntityRequestValidator = new UpdateEntityRequestValidator(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName, _parentKeys, _theusings);
 
-                                        Log.Information("Create Controller");
+                                        _log.LogInformation("Create Controller");
                                         var controllerpath = Path.Combine(sourceSettings.PathToFSHBoilerPlate, sourceSettings.PathToControllers);
                                         EntityChildController newEntityController = new EntityChildController(sourceSettings.LocalTxtSourcesPath, sourceSettings.ControllersNamespace, controllerpath, _entityName, _entityPlural, sourceSettings.StringNameSpace);
                                     }
                                     else
                                     {
-                                        Log.Information("Create DTO");
+                                        _log.LogInformation("Create DTO");
                                         CreateDto newCreateDto = new CreateDto(applicationCatalog, _propertyLines.Trim(), _detailLines.Trim(), _parentLines.Trim(), _guidLines.Trim(), _dtoLines.Trim(), _theusings, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural.Trim(), _hasNavigations);
-                                        Log.Information("Create " + _entityName + " Request");
-                                        CreateParentEntityRequest newEntityCreateRequest = new CreateParentEntityRequest(applicationCatalog, _request, _propertyLines.Trim(), sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName);
-                                        Log.Information("Create Delete " + _entityName + " Request");
-                                        DeleteEntityRequest newDeleteEntityRequest = new DeleteEntityRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _usingpathtochildren, _readrepositoryLines.Trim(), _publicrepositoryLine, _repo_Repo, _repoRepo, _foreignKeys);
-                                        Log.Information("Create " + _entityName + " By Name spec");
+                                      
+                                        _log.LogInformation("Create " + _entityName + " Request");
+                                        CreateParentEntityRequest newEntityCreateRequest = new CreateParentEntityRequest(applicationCatalog, _request, _propertyLines.Trim(), sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName, _guidLines);
+                                        
+                                        _log.LogInformation("Create Delete " + _entityName + " Request");
+                                       // DeleteEntityRequest newDeleteEntityRequest = new DeleteEntityRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _usingpathtochildren, _readrepositoryLines.Trim(), _publicrepositoryLine, _repo_Repo, _repoRepo, _foreignKeys);
+                                        DeleteEntityRequest newDeleteEntityRequest = new DeleteEntityRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _theusings, _readrepositoryLines.Trim(), _publicrepositoryLine, _repo_Repo, _repoRepo, _foreignKeys);
+
+                                        _log.LogInformation("Create " + _entityName + " By Name spec");
                                         CreateEntityByTypeSpec newEntityByNameSpec = new CreateEntityByTypeSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _validatorType, _validatorName);
-                                        Log.Information("Create Update Eentity Request");
-                                        UpdateEntityRequest newEntityUpdateRequest = new UpdateEntityRequest(sourceSettings.PathToData, applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName, _propertyLines.Trim(),_request);
-                                        Log.Information("Create Get" + _entityName + " Request");
+                                        
+                                        _log.LogInformation("Create Update Eentity Request");
+                                        UpdateEntityRequest newEntityUpdateRequest = new UpdateEntityRequest(sourceSettings.PathToData, applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing, _validatorType, _validatorName, _propertyLines.Trim(),_request,_guidLines);
+                                        
+                                        _log.LogInformation("Create Get" + _entityName + " Request");
                                         GetSingleResultEntityRequest newGetEntityRequest = new GetSingleResultEntityRequest(sourceSettings.PathToData, applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural);
-                                        Log.Information("Create Search" + _entityName + " Request");
+                                        
+                                        _log.LogInformation("Create Search" + _entityName + " Request");
                                         SearchEntityRequest newSearchEntityRequest = new SearchEntityRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural);
-                                        Log.Information("Create Controller");
+                                        
+                                        _log.LogInformation("Create Controller");
                                         var controllerpath = Path.Combine(sourceSettings.PathToFSHBoilerPlate, sourceSettings.PathToControllers);
                                         EntityController newEntityController = new EntityController(sourceSettings.LocalTxtSourcesPath, sourceSettings.ControllersNamespace, controllerpath, _entityName, _entityPlural, sourceSettings.StringNameSpace);
                                     }                                  
@@ -228,11 +247,11 @@ namespace FSHCodeGenerator.Classes
             
             // Add Entity to permissions if it not exists
             
-            Log.Information("Check and if not Exist Insert" + _entityName + " Permissions");
+            _log.LogInformation("Check and if not Exist Insert" + _entityName + " Permissions");
             string filepath = Path.Combine(sourceSettings.PathToFSHBoilerPlate, sourceSettings.PathToPermissions);
-            CheckAndAddPermissions newCheckAndAddPermissions = new CheckAndAddPermissions(sourceSettings.LocalTxtSourcesPath, filepath, _newEntities, sourceSettings.PermissionsNameSpace);
+            CheckAndAddPermissions newCheckAndAddPermissions = new CheckAndAddPermissions(sourceSettings.LocalTxtSourcesPath, filepath, _allEntities, sourceSettings.PermissionsNameSpace);
 
-            Log.Information("Sources Generated");
+            _log.LogInformation("Sources Generated");
         }
 
         private void EntityProperties(string entity, string entitypLural, string dataPath, string stringNamespace, Dictionary<string, string> theEntities)
@@ -245,6 +264,9 @@ namespace FSHCodeGenerator.Classes
             _parentLines = string.Empty;
             _detailLines = string.Empty;
             _dtoLines = string.Empty;
+            _request = string.Empty;
+            _theusings = string.Empty;
+            
             string _entityToCheck = string.Empty;
             string _props = string.Empty;
             string getSet = string.Empty;
@@ -271,7 +293,7 @@ namespace FSHCodeGenerator.Classes
                     string inputLine = parts[0] + " " + parts[1] + " " + parts[2];
                     string requestPart = "request." + parts[2];
                     getSet = string.Equals(parts[1], "string") ? "{ get; set; } = default!;" : "{ get; set; }";
-                    _request = _request + requestPart;
+                    _request = _request + requestPart+", ";
                     if (parts[1] == "Guid")
                     {                     
                         _guidLines = _guidLines  + inputLine.Trim() + " " + getSet + Environment.NewLine + "\t";
@@ -281,12 +303,7 @@ namespace FSHCodeGenerator.Classes
 
                         _propertyLines = _propertyLines + inputLine.Trim() + " " + getSet + Environment.NewLine + "\t";
                     }
-
-                    if (!String.IsNullOrEmpty(requestPart))
-                    {
-                        _request = _request + ", ";
-
-                    }
+                   
 
                 }
                 if (line.Contains("public") && line.Contains("virtual")) // Navigation properties in entity
@@ -326,8 +343,11 @@ namespace FSHCodeGenerator.Classes
 
                     }
                 }
+               
             }
         }
+
+       
     }
 }
 

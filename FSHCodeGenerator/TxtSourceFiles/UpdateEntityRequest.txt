@@ -4,6 +4,7 @@ public class Update<&Entity&>Request : IRequest<Guid>
 {
     public Guid Id { get; set; }
     <&PropertyLines&>
+    <&GuidLines&>
 }
 
 public class Update<&Entity&>RequestValidator : CustomValidator<Update<&Entity&>Request>
@@ -32,7 +33,8 @@ public class Update<&Entity&>RequestHandler : IRequestHandler<Update<&Entity&>Re
     {
         var <&EntityToLower&> = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-        _ = <&EntityToLower&>?? throw new NotFoundException(_t["<&Entity&> {0} Not Found.", request.Id]);
+        _ = <&EntityToLower&>
+        ?? throw new NotFoundException(_t["<&Entity&> {0} Not Found.", request.Id]);
 
 
         <&EntityToLower&>.Update(<&Request&>);

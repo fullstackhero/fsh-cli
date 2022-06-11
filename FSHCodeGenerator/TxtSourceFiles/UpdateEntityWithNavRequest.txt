@@ -6,6 +6,7 @@ public class Update<&Entity&>Request : IRequest<Guid>
 {
     public Guid Id { get; set; }
    <&PropertyLines&>
+   <&GuidLines&>
 }
 
 public class Update<&Entity&>RequestHandler : IRequestHandler<Update<&Entity&>Request, Guid>
