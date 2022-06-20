@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using FSHCodeGenerator.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using FSHCodeGenerator.Models;
 
-namespace FSHCodeGenerator
+namespace FSHCodeGenerator.Context
+
 {
     public partial class SourceGenContext : DbContext
     {
@@ -17,197 +18,406 @@ namespace FSHCodeGenerator
         {
         }
 
-        public virtual DbSet<AggregatedCounter> AggregatedCounters { get; set; } = null!;
-        public virtual DbSet<AuditTrail> AuditTrails { get; set; } = null!;
+        public virtual DbSet<Aggregatedcounter> Aggregatedcounters { get; set; } = null!;
+        public virtual DbSet<Audittrail> Audittrails { get; set; } = null!;
         public virtual DbSet<Brand> Brands { get; set; } = null!;
+        public virtual DbSet<Channel> Channels { get; set; } = null!;
         public virtual DbSet<Counter> Counters { get; set; } = null!;
+        public virtual DbSet<Distributedlock> Distributedlocks { get; set; } = null!;
+        public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; } = null!;
         public virtual DbSet<Hash> Hashes { get; set; } = null!;
         public virtual DbSet<Job> Jobs { get; set; } = null!;
-        public virtual DbSet<JobParameter> JobParameters { get; set; } = null!;
-        public virtual DbSet<JobQueue> JobQueues { get; set; } = null!;
+        public virtual DbSet<Jobparameter> Jobparameters { get; set; } = null!;
+        public virtual DbSet<Jobqueue> Jobqueues { get; set; } = null!;
+        public virtual DbSet<Jobstate> Jobstates { get; set; } = null!;
         public virtual DbSet<List> Lists { get; set; } = null!;
+        public virtual DbSet<MediaType> MediaTypes { get; set; } = null!;
+        public virtual DbSet<MyChannel> MyChannels { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
-        public virtual DbSet<RoleClaim> RoleClaims { get; set; } = null!;
-        public virtual DbSet<Schema> Schemas { get; set; } = null!;
+        public virtual DbSet<Roleclaim> Roleclaims { get; set; } = null!;
         public virtual DbSet<Server> Servers { get; set; } = null!;
         public virtual DbSet<Set> Sets { get; set; } = null!;
         public virtual DbSet<State> States { get; set; } = null!;
         public virtual DbSet<Tenant> Tenants { get; set; } = null!;
-        public virtual DbSet<TheChild> TheChildren { get; set; } = null!;
-        public virtual DbSet<TheParent> TheParents { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
-        public virtual DbSet<UserClaim> UserClaims { get; set; } = null!;
-        public virtual DbSet<UserLogin> UserLogins { get; set; } = null!;
-        public virtual DbSet<UserRole> UserRoles { get; set; } = null!;
-        public virtual DbSet<UserToken> UserTokens { get; set; } = null!;
+        public virtual DbSet<Userclaim> Userclaims { get; set; } = null!;
+        public virtual DbSet<Userlogin> Userlogins { get; set; } = null!;
+        public virtual DbSet<Userrole> Userroles { get; set; } = null!;
+        public virtual DbSet<Usertoken> Usertokens { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=fullStackHeroDb;Integrated Security=True;MultipleActiveResultSets=True");
-            }
+            //if (!optionsBuilder.IsConfigured)
+            //{
+
+            //    optionsBuilder.UseMySQL("server=localhost;user=root;password=MySqlHeyd6941;database=AppingWebCollection", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.28-mysql"));
+            //}
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AggregatedCounter>(entity =>
+            modelBuilder.UseCollation("utf8mb4_0900_ai_ci")
+                ;
+
+            modelBuilder.Entity<Aggregatedcounter>(entity =>
             {
-                entity.HasKey(e => e.Key)
-                    .HasName("PK_HangFire_CounterAggregated");
+                entity.ToTable("aggregatedcounter");
 
-                entity.ToTable("AggregatedCounter", "HangFire");
+               // entity.UseCollation("utf8_general_ci");
 
-                entity.HasIndex(e => e.ExpireAt, "IX_HangFire_AggregatedCounter_ExpireAt")
-                    .HasFilter("([ExpireAt] IS NOT NULL)");
-
-                entity.Property(e => e.Key).HasMaxLength(100);
+                entity.HasIndex(e => e.Key, "IX_CounterAggregated_Key")
+                    .IsUnique();
 
                 entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+
+                entity.Property(e => e.Key).HasMaxLength(100);
             });
 
-            modelBuilder.Entity<AuditTrail>(entity =>
+            modelBuilder.Entity<Audittrail>(entity =>
             {
-                entity.ToTable("AuditTrails", "Auditing");
+                entity.ToTable("audittrails");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.DateTime).HasMaxLength(6);
 
                 entity.Property(e => e.TenantId).HasMaxLength(64);
+
+                entity.Property(e => e.UserId)
+                    .UseCollation("ascii_general_ci")
+                    ;
             });
 
             modelBuilder.Entity<Brand>(entity =>
             {
-                entity.ToTable("Brands", "Catalog");
+                entity.ToTable("brands");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id)
+                    .UseCollation("ascii_general_ci");
+
+                entity.Property(e => e.CreatedBy)
+                    .UseCollation("ascii_general_ci");
+
+                entity.Property(e => e.CreatedOn).HasMaxLength(6);
+
+                entity.Property(e => e.DeletedBy)
+                    .UseCollation("ascii_general_ci");
+
+                entity.Property(e => e.DeletedOn).HasMaxLength(6);
+
+                entity.Property(e => e.LastModifiedBy)
+                    .UseCollation("ascii_general_ci");
+                    
+
+                entity.Property(e => e.LastModifiedOn).HasMaxLength(6);
 
                 entity.Property(e => e.Name).HasMaxLength(256);
 
                 entity.Property(e => e.TenantId).HasMaxLength(64);
             });
 
+            modelBuilder.Entity<Channel>(entity =>
+            {
+                entity.ToTable("channels");
+
+                entity.HasIndex(e => e.MediaTypeId, "IX_Channels_MediaTypeId");
+
+                entity.Property(e => e.Id)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedOn).HasMaxLength(6);
+
+                entity.Property(e => e.DeletedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.DeletedOn).HasMaxLength(6);
+
+                entity.Property(e => e.LastModifiedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.LastModifiedOn).HasMaxLength(6);
+
+                entity.Property(e => e.MediaTypeId)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.HasOne(d => d.MediaType)
+                    .WithMany(p => p.Channels)
+                    .HasForeignKey(d => d.MediaTypeId)
+                    .HasConstraintName("FK_Channels_MediaTypes_MediaTypeId");
+            });
+
             modelBuilder.Entity<Counter>(entity =>
             {
-                entity.HasNoKey();
+                entity.ToTable("counter");
 
-                entity.ToTable("Counter", "HangFire");
+              //  entity.HasCharSet("utf8")
+              //      .UseCollation("utf8_general_ci");
 
-                entity.HasIndex(e => e.Key, "CX_HangFire_Counter")
-                    .IsClustered();
+                entity.HasIndex(e => e.Key, "IX_Counter_Key");
 
                 entity.Property(e => e.ExpireAt).HasColumnType("datetime");
 
                 entity.Property(e => e.Key).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<Distributedlock>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("distributedlock");
+
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
+
+                entity.Property(e => e.CreatedAt).HasMaxLength(6);
+
+                entity.Property(e => e.Resource).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<Efmigrationshistory>(entity =>
+            {
+                entity.HasKey(e => e.MigrationId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("__efmigrationshistory");
+
+                entity.Property(e => e.MigrationId).HasMaxLength(150);
+
+                entity.Property(e => e.ProductVersion).HasMaxLength(32);
             });
 
             modelBuilder.Entity<Hash>(entity =>
             {
-                entity.HasKey(e => new { e.Key, e.Field })
-                    .HasName("PK_HangFire_Hash");
+                entity.ToTable("hash");
 
-                entity.ToTable("Hash", "HangFire");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
 
-                entity.HasIndex(e => e.ExpireAt, "IX_HangFire_Hash_ExpireAt")
-                    .HasFilter("([ExpireAt] IS NOT NULL)");
+                entity.HasIndex(e => new { e.Key, e.Field }, "IX_Hash_Key_Field")
+                    .IsUnique();
+
+                entity.Property(e => e.ExpireAt).HasMaxLength(6);
+
+                entity.Property(e => e.Field).HasMaxLength(40);
 
                 entity.Property(e => e.Key).HasMaxLength(100);
-
-                entity.Property(e => e.Field).HasMaxLength(100);
             });
 
             modelBuilder.Entity<Job>(entity =>
             {
-                entity.ToTable("Job", "HangFire");
+                entity.ToTable("job");
 
-                entity.HasIndex(e => e.ExpireAt, "IX_HangFire_Job_ExpireAt")
-                    .HasFilter("([ExpireAt] IS NOT NULL)");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
 
-                entity.HasIndex(e => e.StateName, "IX_HangFire_Job_StateName")
-                    .HasFilter("([StateName] IS NOT NULL)");
+                entity.HasIndex(e => e.StateName, "IX_Job_StateName");
 
-                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.CreatedAt).HasMaxLength(6);
 
-                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+                entity.Property(e => e.ExpireAt).HasMaxLength(6);
 
                 entity.Property(e => e.StateName).HasMaxLength(20);
             });
 
-            modelBuilder.Entity<JobParameter>(entity =>
+            modelBuilder.Entity<Jobparameter>(entity =>
             {
-                entity.HasKey(e => new { e.JobId, e.Name })
-                    .HasName("PK_HangFire_JobParameter");
+                entity.ToTable("jobparameter");
 
-                entity.ToTable("JobParameter", "HangFire");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
+
+                entity.HasIndex(e => e.JobId, "FK_JobParameter_Job");
+
+                entity.HasIndex(e => new { e.JobId, e.Name }, "IX_JobParameter_JobId_Name")
+                    .IsUnique();
 
                 entity.Property(e => e.Name).HasMaxLength(40);
 
                 entity.HasOne(d => d.Job)
-                    .WithMany(p => p.JobParameters)
+                    .WithMany(p => p.Jobparameters)
                     .HasForeignKey(d => d.JobId)
-                    .HasConstraintName("FK_HangFire_JobParameter_Job");
+                    .HasConstraintName("FK_JobParameter_Job");
             });
 
-            modelBuilder.Entity<JobQueue>(entity =>
+            modelBuilder.Entity<Jobqueue>(entity =>
             {
-                entity.HasKey(e => new { e.Queue, e.Id })
-                    .HasName("PK_HangFire_JobQueue");
+                entity.ToTable("jobqueue");
 
-                entity.ToTable("JobQueue", "HangFire");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
+
+                entity.HasIndex(e => new { e.Queue, e.FetchedAt }, "IX_JobQueue_QueueAndFetchedAt");
+
+                entity.Property(e => e.FetchToken).HasMaxLength(36);
+
+                entity.Property(e => e.FetchedAt).HasMaxLength(6);
 
                 entity.Property(e => e.Queue).HasMaxLength(50);
+            });
 
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Jobstate>(entity =>
+            {
+                entity.ToTable("jobstate");
 
-                entity.Property(e => e.FetchedAt).HasColumnType("datetime");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
+
+                entity.HasIndex(e => e.JobId, "FK_JobState_Job");
+
+                entity.Property(e => e.CreatedAt).HasMaxLength(6);
+
+                entity.Property(e => e.Name).HasMaxLength(20);
+
+                entity.Property(e => e.Reason).HasMaxLength(100);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.Jobstates)
+                    .HasForeignKey(d => d.JobId)
+                    .HasConstraintName("FK_JobState_Job");
             });
 
             modelBuilder.Entity<List>(entity =>
             {
-                entity.HasKey(e => new { e.Key, e.Id })
-                    .HasName("PK_HangFire_List");
+                entity.ToTable("list");
 
-                entity.ToTable("List", "HangFire");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
 
-                entity.HasIndex(e => e.ExpireAt, "IX_HangFire_List_ExpireAt")
-                    .HasFilter("([ExpireAt] IS NOT NULL)");
+                entity.Property(e => e.ExpireAt).HasMaxLength(6);
 
                 entity.Property(e => e.Key).HasMaxLength(100);
+            });
 
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<MediaType>(entity =>
+            {
+                entity.ToTable("mediatypes");
 
-                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+                entity.Property(e => e.Id)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedOn).HasMaxLength(6);
+
+                entity.Property(e => e.DeletedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.DeletedOn).HasMaxLength(6);
+
+                entity.Property(e => e.LastModifiedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.LastModifiedOn).HasMaxLength(6);
+            });
+
+            modelBuilder.Entity<MyChannel>(entity =>
+            {
+                entity.ToTable("mychannels");
+
+                entity.HasIndex(e => e.ChannelId, "IX_MyChannels_ChannelId");
+
+                entity.Property(e => e.Id)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.ChannelId)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedOn).HasMaxLength(6);
+
+                entity.Property(e => e.DeletedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.DeletedOn).HasMaxLength(6);
+
+                entity.Property(e => e.LastModifiedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.LastModifiedOn).HasMaxLength(6);
+
+                entity.Property(e => e.UserId)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.HasOne(d => d.Channel)
+                    .WithMany(p => p.MyChannels)
+                    .HasForeignKey(d => d.ChannelId)
+                    .HasConstraintName("FK_MyChannels_Channels_ChannelId");
             });
 
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.ToTable("Products", "Catalog");
+                entity.ToTable("products");
 
                 entity.HasIndex(e => e.BrandId, "IX_Products_BrandId");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.BrandId)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.CreatedOn).HasMaxLength(6);
+
+                entity.Property(e => e.DeletedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
+
+                entity.Property(e => e.DeletedOn).HasMaxLength(6);
 
                 entity.Property(e => e.ImagePath).HasMaxLength(2048);
 
-                entity.Property(e => e.Name).HasMaxLength(1024);
+                entity.Property(e => e.LastModifiedBy)
+                    .UseCollation("ascii_general_ci")
+                   ;
 
-                entity.Property(e => e.Rate).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.LastModifiedOn).HasMaxLength(6);
+
+                entity.Property(e => e.Name).HasMaxLength(1024);
 
                 entity.Property(e => e.TenantId).HasMaxLength(64);
 
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.Products)
-                    .HasForeignKey(d => d.BrandId);
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Products_Brands_BrandId");
             });
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.ToTable("Roles", "Identity");
+                entity.ToTable("roles");
 
                 entity.HasIndex(e => new { e.NormalizedName, e.TenantId }, "RoleNameIndex")
-                    .IsUnique()
-                    .HasFilter("([NormalizedName] IS NOT NULL)");
+                    .IsUnique();
 
                 entity.Property(e => e.Name).HasMaxLength(256);
 
@@ -216,69 +426,63 @@ namespace FSHCodeGenerator
                 entity.Property(e => e.TenantId).HasMaxLength(64);
             });
 
-            modelBuilder.Entity<RoleClaim>(entity =>
+            modelBuilder.Entity<Roleclaim>(entity =>
             {
-                entity.ToTable("RoleClaims", "Identity");
+                entity.ToTable("roleclaims");
 
                 entity.HasIndex(e => e.RoleId, "IX_RoleClaims_RoleId");
+
+                entity.Property(e => e.CreatedOn).HasMaxLength(6);
+
+                entity.Property(e => e.LastModifiedOn).HasMaxLength(6);
 
                 entity.Property(e => e.TenantId).HasMaxLength(64);
 
                 entity.HasOne(d => d.Role)
-                    .WithMany(p => p.RoleClaims)
-                    .HasForeignKey(d => d.RoleId);
-            });
-
-            modelBuilder.Entity<Schema>(entity =>
-            {
-                entity.HasKey(e => e.Version)
-                    .HasName("PK_HangFire_Schema");
-
-                entity.ToTable("Schema", "HangFire");
-
-                entity.Property(e => e.Version).ValueGeneratedNever();
+                    .WithMany(p => p.Roleclaims)
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK_RoleClaims_Roles_RoleId");
             });
 
             modelBuilder.Entity<Server>(entity =>
             {
-                entity.ToTable("Server", "HangFire");
+                entity.ToTable("server");
 
-                entity.HasIndex(e => e.LastHeartbeat, "IX_HangFire_Server_LastHeartbeat");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
 
-                entity.Property(e => e.Id).HasMaxLength(200);
+                entity.Property(e => e.Id).HasMaxLength(100);
 
-                entity.Property(e => e.LastHeartbeat).HasColumnType("datetime");
+                entity.Property(e => e.LastHeartbeat).HasMaxLength(6);
             });
 
             modelBuilder.Entity<Set>(entity =>
             {
-                entity.HasKey(e => new { e.Key, e.Value })
-                    .HasName("PK_HangFire_Set");
+                entity.ToTable("set");
 
-                entity.ToTable("Set", "HangFire");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
 
-                entity.HasIndex(e => e.ExpireAt, "IX_HangFire_Set_ExpireAt")
-                    .HasFilter("([ExpireAt] IS NOT NULL)");
+                entity.HasIndex(e => new { e.Key, e.Value }, "IX_Set_Key_Value")
+                    .IsUnique();
 
-                entity.HasIndex(e => new { e.Key, e.Score }, "IX_HangFire_Set_Score");
+                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
 
                 entity.Property(e => e.Key).HasMaxLength(100);
 
                 entity.Property(e => e.Value).HasMaxLength(256);
-
-                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<State>(entity =>
             {
-                entity.HasKey(e => new { e.JobId, e.Id })
-                    .HasName("PK_HangFire_State");
+                entity.ToTable("state");
 
-                entity.ToTable("State", "HangFire");
+                //entity.HasCharSet("utf8")
+                //    .UseCollation("utf8_general_ci");
 
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(e => e.JobId, "FK_HangFire_State_Job");
 
-                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.CreatedAt).HasMaxLength(6);
 
                 entity.Property(e => e.Name).HasMaxLength(20);
 
@@ -292,51 +496,28 @@ namespace FSHCodeGenerator
 
             modelBuilder.Entity<Tenant>(entity =>
             {
-                entity.ToTable("Tenants", "MultiTenancy");
+                entity.ToTable("tenants");
 
                 entity.HasIndex(e => e.Identifier, "IX_Tenants_Identifier")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasMaxLength(64);
-            });
 
-            modelBuilder.Entity<TheChild>(entity =>
-            {
-                entity.ToTable("TheChildren", "Catalog");
-
-                entity.HasIndex(e => e.BrandId, "IX_TheChildren_BrandId");
-
-                entity.HasIndex(e => e.TheParentId, "IX_TheChildren_TheParentId");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.TheChildren)
-                    .HasForeignKey(d => d.BrandId);
-
-                entity.HasOne(d => d.TheParent)
-                    .WithMany(p => p.TheChildren)
-                    .HasForeignKey(d => d.TheParentId);
-            });
-
-            modelBuilder.Entity<TheParent>(entity =>
-            {
-                entity.ToTable("TheParents", "Catalog");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.ValidUpto).HasMaxLength(6);
             });
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("Users", "Identity");
+                entity.ToTable("users");
 
                 entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
 
                 entity.HasIndex(e => new { e.NormalizedUserName, e.TenantId }, "UserNameIndex")
-                    .IsUnique()
-                    .HasFilter("([NormalizedUserName] IS NOT NULL)");
+                    .IsUnique();
 
                 entity.Property(e => e.Email).HasMaxLength(256);
+
+                entity.Property(e => e.LockoutEnd).HasMaxLength(6);
 
                 entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
 
@@ -344,27 +525,30 @@ namespace FSHCodeGenerator
 
                 entity.Property(e => e.ObjectId).HasMaxLength(256);
 
+                entity.Property(e => e.RefreshTokenExpiryTime).HasMaxLength(6);
+
                 entity.Property(e => e.TenantId).HasMaxLength(64);
 
                 entity.Property(e => e.UserName).HasMaxLength(256);
             });
 
-            modelBuilder.Entity<UserClaim>(entity =>
+            modelBuilder.Entity<Userclaim>(entity =>
             {
-                entity.ToTable("UserClaims", "Identity");
+                entity.ToTable("userclaims");
 
                 entity.HasIndex(e => e.UserId, "IX_UserClaims_UserId");
 
                 entity.Property(e => e.TenantId).HasMaxLength(64);
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserClaims)
-                    .HasForeignKey(d => d.UserId);
+                    .WithMany(p => p.Userclaims)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_UserClaims_Users_UserId");
             });
 
-            modelBuilder.Entity<UserLogin>(entity =>
+            modelBuilder.Entity<Userlogin>(entity =>
             {
-                entity.ToTable("UserLogins", "Identity");
+                entity.ToTable("userlogins");
 
                 entity.HasIndex(e => new { e.LoginProvider, e.ProviderKey, e.TenantId }, "IX_UserLogins_LoginProvider_ProviderKey_TenantId")
                     .IsUnique();
@@ -374,40 +558,48 @@ namespace FSHCodeGenerator
                 entity.Property(e => e.TenantId).HasMaxLength(64);
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserLogins)
-                    .HasForeignKey(d => d.UserId);
+                    .WithMany(p => p.Userlogins)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_UserLogins_Users_UserId");
             });
 
-            modelBuilder.Entity<UserRole>(entity =>
+            modelBuilder.Entity<Userrole>(entity =>
             {
-                entity.HasKey(e => new { e.UserId, e.RoleId });
+                entity.HasKey(e => new { e.UserId, e.RoleId })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
-                entity.ToTable("UserRoles", "Identity");
+                entity.ToTable("userroles");
 
                 entity.HasIndex(e => e.RoleId, "IX_UserRoles_RoleId");
 
                 entity.Property(e => e.TenantId).HasMaxLength(64);
 
                 entity.HasOne(d => d.Role)
-                    .WithMany(p => p.UserRoles)
-                    .HasForeignKey(d => d.RoleId);
+                    .WithMany(p => p.Userroles)
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK_UserRoles_Roles_RoleId");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserRoles)
-                    .HasForeignKey(d => d.UserId);
+                    .WithMany(p => p.Userroles)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_UserRoles_Users_UserId");
             });
 
-            modelBuilder.Entity<UserToken>(entity =>
+            modelBuilder.Entity<Usertoken>(entity =>
             {
-                entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+                entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
 
-                entity.ToTable("UserTokens", "Identity");
+                entity.ToTable("usertokens");
 
                 entity.Property(e => e.TenantId).HasMaxLength(64);
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserTokens)
-                    .HasForeignKey(d => d.UserId);
+                    .WithMany(p => p.Usertokens)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_UserTokens_Users_UserId");
             });
 
             OnModelCreatingPartial(modelBuilder);

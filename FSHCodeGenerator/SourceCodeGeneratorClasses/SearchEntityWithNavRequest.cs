@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FSHCodeGenerator.SourceCodeGeneratorClasses;
 internal class SearchEntityWithNavRequest
 {
-    public SearchEntityWithNavRequest(string filesavelocation, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural,Dictionary<string, string> fks,Dictionary<string,string> allentities)
+    public SearchEntityWithNavRequest(string filesavelocation, string pathtobasicsources, string stringnamespace, string entity, string entitynameplural,Dictionary<string, string> fks,Dictionary<string,string> theentities)
     {
         string basicsources = pathtobasicsources + "SearchEntityWithNavRequest.txt";
         string thenamespace = stringnamespace + entitynameplural;
@@ -19,7 +19,7 @@ internal class SearchEntityWithNavRequest
         foreach (var key in fks)
         {
             parententity = key.Key;
-            bool entityFound = allentities.TryGetValue(parententity, out parententityplural);
+            bool entityFound = theentities.TryGetValue(parententity, out parententityplural);
             //parententityplural = key.Value;
 
             parentguids = parentguids + "public Guid? " + parententity + "Id { get; set; }" + Environment.NewLine + "\t";                 

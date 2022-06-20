@@ -11,8 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using ILogger = Serilog.ILogger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using MySql.EntityFrameworkCore;
 using FSHCodeGenerator.SourceCodeGeneratorClasses;
 using System.Linq.Expressions;
+using FSHCodeGenerator.Context;
 
 namespace FSHCodeGenerator.Classes
 {
@@ -39,7 +41,7 @@ namespace FSHCodeGenerator.Classes
         private string _request = string.Empty;
         private string _valuesingle = string.Empty;
         private string _validatorType = string.Empty;
-        private string _validatorName = string.Empty;
+        private string _validatorName = string.Empty;        
         private bool _hasNavigations = false;
              
 
@@ -69,7 +71,9 @@ namespace FSHCodeGenerator.Classes
             // create dictionary with all the entity and dbset names of our SourceGenContext to be used for navigationproperties
             foreach (var entityType in _genContext.Model.GetEntityTypes())
             {
-               _allEntities.Add(entityType.DisplayName(), entityType.GetTableName());               
+               _allEntities.Add(entityType.DisplayName(), entityType.GetTableName());
+               
+
             }
             entityTypes?.ToList().ForEach(t =>
                     {
@@ -108,7 +112,7 @@ namespace FSHCodeGenerator.Classes
                                 _log.LogInformation("Resolving => " + t.DisplayName());
                                 
                                 Directory.CreateDirectory(pathToCatalog = Path.Combine(Path.Combine(sourceSettings.PathToFSHBoilerPlate, sourceSettings.PathToApplicationCatalog + _entityPlural.Trim())));
-
+                              
                                 var pathToEntity = Path.Combine(sourceSettings.PathToFSHBoilerPlate, sourceSettings.PathToData);
                                 _hasNavigations = t.GetNavigations().Count() > 0 ? true : false;
                                 if (_hasNavigations)
@@ -173,7 +177,7 @@ namespace FSHCodeGenerator.Classes
                                     {
                                         _log.LogInformation("Create EventHandlers");
                                         string pathToEventHandlers = applicationCatalog + "\\EventHandlers";
-                                        CreateEventHandlers newEventHandlers = new CreateEventHandlers(pathToEventHandlers, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural);
+                                        CreateEventHandlers newEventHandlers = new CreateEventHandlers(pathToEventHandlers, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, sourceSettings.EventsUsing);
 
                                         _log.LogInformation("Create DTO");
                                         CreateDto newNavCreateDto = new CreateDto(applicationCatalog, _propertyLines.Trim() , _detailLines.Trim(), _parentLines.Trim(), _guidLines.Trim(), _dtoLines.Trim(), _theusings, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural.Trim(), _hasNavigations); ;
@@ -190,7 +194,7 @@ namespace FSHCodeGenerator.Classes
                                         _log.LogInformation("Create" + _entityName + " By Parent Spec");
                                         CreateEntityByParentSpec newEntityByParentSpec = new CreateEntityByParentSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys);
 
-                                        _log.LogInformation("Create" + _entityName + " By Name spec");
+                                        _log.LogInformation("Create" + _entityName + " By First Field spec");
                                         CreateEntityByTypeSpec newEntityByNameSpec = new CreateEntityByTypeSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _validatorType, _validatorName);
 
                                         _log.LogInformation("Create Get" + _entityName + " via Dapper request");
@@ -200,7 +204,7 @@ namespace FSHCodeGenerator.Classes
                                         GetEntityWithNavRequest newGetEntityWithNavRequest = new GetEntityWithNavRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _foreignKeys);
 
                                         _log.LogInformation("Create Search" + _entityName + " Request");
-                                        SearchEntityWithNavRequest newSearchParentEntityRequest = new SearchEntityWithNavRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys,_allEntities);
+                                        SearchEntityWithNavRequest newSearchParentEntityRequest = new SearchEntityWithNavRequest(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _parentKeys,theEntities);
                                         EntitiesBySearchRequestWithParentSpec newEntitiesBySearchRequestWithParentSpec = new EntitiesBySearchRequestWithParentSpec(applicationCatalog, sourceSettings.LocalTxtSourcesPath, sourceSettings.StringNameSpace, _entityName, _entityPlural, _foreignKeys);
 
                                         _log.LogInformation("Create Update" + _entityName + " Request");
@@ -249,7 +253,7 @@ namespace FSHCodeGenerator.Classes
             
             _log.LogInformation("Check and if not Exist Insert" + _entityName + " Permissions");
             string filepath = Path.Combine(sourceSettings.PathToFSHBoilerPlate, sourceSettings.PathToPermissions);
-            CheckAndAddPermissions newCheckAndAddPermissions = new CheckAndAddPermissions(sourceSettings.LocalTxtSourcesPath, filepath, _allEntities, sourceSettings.PermissionsNameSpace);
+            CheckAndAddPermissions newCheckAndAddPermissions = new CheckAndAddPermissions(sourceSettings.LocalTxtSourcesPath, filepath, theEntities, sourceSettings.PermissionsNameSpace);
 
             _log.LogInformation("Sources Generated");
         }

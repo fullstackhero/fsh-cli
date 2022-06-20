@@ -1,6 +1,6 @@
-﻿using FSH.WebApi.Application.Catalog.<&EntityPlural&>;
+﻿using <&StringUsing&><&EntityPlural&>;
 
-namespace FSH.WebApi.Host.Controllers.Catalog;
+namespace <&StringNameSpace&>;
 
 public class <&EntityPlural&>Controller : VersionedApiController
 {

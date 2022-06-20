@@ -6,6 +6,8 @@ using FSHCodeGenerator.Classes;
 using FSHCodeGenerator.InterFaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using MySql.EntityFrameworkCore;
+using FSHCodeGenerator.Context;
 
 namespace FSHCodeGenerator
 {

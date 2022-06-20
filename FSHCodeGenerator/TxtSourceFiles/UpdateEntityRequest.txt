@@ -1,4 +1,4 @@
-﻿namespace FSH.WebApi.Application.Catalog.<&EntityPlural&>;
+﻿namespace <&StringNameSpace&>;
 
 public class Update<&Entity&>Request : IRequest<Guid>
 {

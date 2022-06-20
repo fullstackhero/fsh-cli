@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FSHCodeGenerator.Models
 {
-    public partial class UserRole
+    public partial class Userrole
     {
         public string UserId { get; set; } = null!;
         public string RoleId { get; set; } = null!;

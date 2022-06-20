@@ -1,7 +1,7 @@
 ﻿namespace <&StringNameSpace&>;
 
-public class <&Entity&>ByNameSpec : Specification<<&Entity&>>, ISingleResultSpecification
+public class <&Entity&>By<&ValidatorName&>Spec : Specification<<&Entity&>>, ISingleResultSpecification
 {
-    public <&Entity&>ByNameSpec(string name) =>
-        Query.Where(p => p.Name == name);
+    public <&Entity&>By<&ValidatorName&>Spec(<&ValidatorType&> <&ValidatorName&>) =>
+        Query.Where(p => p.<&ValidatorName&> == <&ValidatorName&>);
 }

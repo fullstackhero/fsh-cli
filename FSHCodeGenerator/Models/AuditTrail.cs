@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FSHCodeGenerator.Models
 {
-    public partial class AuditTrail
+    public partial class Audittrail
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

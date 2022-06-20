@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FSHCodeGenerator.Models
 {
-    public partial class UserToken
+    public partial class Usertoken
     {
         public string UserId { get; set; } = null!;
         public string LoginProvider { get; set; } = null!;

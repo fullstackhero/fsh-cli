@@ -1,4 +1,4 @@
-﻿using FSH.WebApi.Domain.Common.Events;
+﻿using <&EventsUsing&>;
 
 namespace <&StringNameSpace&>.EventHandlers;
 

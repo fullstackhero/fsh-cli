@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace FSHCodeGenerator.Models
 {
-    public partial class Testchild
+    public partial class MediaType
     {
-        public Testchild()
+        public MediaType()
         {
             Channels = new HashSet<Channel>();
         }

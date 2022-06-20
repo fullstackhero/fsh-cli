@@ -8,7 +8,6 @@ namespace FSHCodeGenerator.Models
         public Brand()
         {
             Products = new HashSet<Product>();
-            TheChildren = new HashSet<TheChild>();
         }
 
         public Guid Id { get; set; }
@@ -23,6 +22,5 @@ namespace FSHCodeGenerator.Models
         public Guid? DeletedBy { get; set; }
 
         public virtual ICollection<Product> Products { get; set; }
-        public virtual ICollection<TheChild> TheChildren { get; set; }
     }
 }

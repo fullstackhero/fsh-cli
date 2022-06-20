@@ -22,8 +22,7 @@ namespace FSHCodeGenerator.Classes
         }
         public async Task<bool> Run()
         {
-            var sourceSettings = _config.GetSection("GenerateSourcesSettings").Get<SourceGenSettings>();
-            //var sourceSettings = _config.GetSection(("GenerateSourcesSettings"));
+            var sourceSettings = _config.GetSection("GenerateSourcesSettings").Get<SourceGenSettings>();          
             bool lDbContextExists = true;
            
             _logger.LogInformation("& Path To FSH Web - Api - BoilerPlate : " + sourceSettings.PathToFSHBoilerPlate);

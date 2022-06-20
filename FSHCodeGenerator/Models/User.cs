@@ -7,10 +7,10 @@ namespace FSHCodeGenerator.Models
     {
         public User()
         {
-            UserClaims = new HashSet<UserClaim>();
-            UserLogins = new HashSet<UserLogin>();
-            UserRoles = new HashSet<UserRole>();
-            UserTokens = new HashSet<UserToken>();
+            Userclaims = new HashSet<Userclaim>();
+            Userlogins = new HashSet<Userlogin>();
+            Userroles = new HashSet<Userrole>();
+            Usertokens = new HashSet<Usertoken>();
         }
 
         public string Id { get; set; } = null!;
@@ -33,13 +33,13 @@ namespace FSHCodeGenerator.Models
         public string? PhoneNumber { get; set; }
         public bool PhoneNumberConfirmed { get; set; }
         public bool TwoFactorEnabled { get; set; }
-        public DateTimeOffset? LockoutEnd { get; set; }
+        public DateTime? LockoutEnd { get; set; }
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
 
-        public virtual ICollection<UserClaim> UserClaims { get; set; }
-        public virtual ICollection<UserLogin> UserLogins { get; set; }
-        public virtual ICollection<UserRole> UserRoles { get; set; }
-        public virtual ICollection<UserToken> UserTokens { get; set; }
+        public virtual ICollection<Userclaim> Userclaims { get; set; }
+        public virtual ICollection<Userlogin> Userlogins { get; set; }
+        public virtual ICollection<Userrole> Userroles { get; set; }
+        public virtual ICollection<Usertoken> Usertokens { get; set; }
     }
 }

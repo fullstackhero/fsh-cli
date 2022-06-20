@@ -7,8 +7,8 @@ namespace FSHCodeGenerator.Models
     {
         public Role()
         {
-            RoleClaims = new HashSet<RoleClaim>();
-            UserRoles = new HashSet<UserRole>();
+            Roleclaims = new HashSet<Roleclaim>();
+            Userroles = new HashSet<Userrole>();
         }
 
         public string Id { get; set; } = null!;
@@ -18,7 +18,7 @@ namespace FSHCodeGenerator.Models
         public string? NormalizedName { get; set; }
         public string? ConcurrencyStamp { get; set; }
 
-        public virtual ICollection<RoleClaim> RoleClaims { get; set; }
-        public virtual ICollection<UserRole> UserRoles { get; set; }
+        public virtual ICollection<Roleclaim> Roleclaims { get; set; }
+        public virtual ICollection<Userrole> Userroles { get; set; }
     }
 }

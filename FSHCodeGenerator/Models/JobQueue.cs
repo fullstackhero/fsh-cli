@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 namespace FSHCodeGenerator.Models
 {
-    public partial class JobQueue
+    public partial class Jobqueue
     {
-        public long Id { get; set; }
-        public long JobId { get; set; }
-        public string Queue { get; set; } = null!;
+        public int Id { get; set; }
+        public int JobId { get; set; }
         public DateTime? FetchedAt { get; set; }
+        public string Queue { get; set; } = null!;
+        public string? FetchToken { get; set; }
     }
 }
