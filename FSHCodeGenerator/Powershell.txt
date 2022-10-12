@@ -1,0 +1,1 @@
+Scaffold-DbContext "Data Source=(localdb)\mssqllocaldb;Initial Catalog=FSHDb;Integrated Security=True;MultipleActiveResultSets=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir Context -Context SourceGenContext -ContextNamespace FSHCodeGenerator -Force
