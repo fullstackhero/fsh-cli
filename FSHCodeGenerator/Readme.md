@@ -10,6 +10,10 @@ IMPORTANT : Before we can start using this tool we need to scaffold the entities
 			=>  command based on fullstackhero !!
 			command =  Scaffold-DbContext "Data Source=(localdb)\mssqllocaldb;Initial Catalog=fullStackHeroDb;Integrated Security=True;MultipleActiveResultSets=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir Context -Context SourceGenContext -ContextNamespace FSHCodeGenerator -Force
 			
+			OR using dotnet-ef
+			
+			command = dotnet ef dbcontext scaffold "Data Source=(localdb)\mssqllocaldb;Initial Catalog=fullStackHeroDb;Integrated Security=True;MultipleActiveResultSets=True" Microsoft.EntityFrameworkCore.SqlServer -o Models --context-dir Context -c SourceGenContext --context-namespace FSHCodeGenerator -f
+			
 			!! there is a fake applicationdbcontext in the project this is needed because otherwise build fails.
 			 the scaffold command has the -Force flag so the fake context is overwritten.	
 			!! single backslash (double backslash = error)
